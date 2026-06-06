@@ -139,7 +139,29 @@ namespace math{
 
 
     // NUMERICAL HELPERS: 
-    
+
+    template<typename T>
+    vec3<T> max(vec3<T>& a, vec3<T>& b){
+        vec3<T> m;
+
+        m.x = std::max(a.x, b.x);
+        m.y = std::max(a.y, b.y);
+        m.z = std::max(a.z, b.z);
+        
+        return m;
+    }   
+    template<typename T>
+    vec3<T> min(vec3<T>& a, vec3<T>& b){
+        vec3<T> m;
+
+        m.x = std::min(a.x, b.x);
+        m.y = std::min(a.y, b.y);
+        m.z = std::min(a.z, b.z);
+        
+        return m;
+    }
+
+    // TYPE SPECIFIC FUNCTION SPECIFIERS
     template<typename Float_T>
     concept Floating = std::is_floating_point_v<Float_T>;
 
@@ -207,7 +229,7 @@ namespace math{
     std::ostream& operator<<(std::ostream& os, const vec3<T>& v){
         return os << "{" << v.x << ", " << v.y << ", " << v.z;
     }
-
+    
 
 }
 
