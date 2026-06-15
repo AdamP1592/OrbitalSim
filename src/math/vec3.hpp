@@ -207,7 +207,7 @@ namespace math{
         return {
             static_cast<T>(std::trunc(v.x)),
             static_cast<T>(std::trunc(v.y)),
-            static_cast<T>(std::abs(v.z))
+            static_cast<T>(std::trunc(v.z))
         };
     }
 
