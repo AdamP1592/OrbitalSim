@@ -13,7 +13,7 @@ class MassMesh{
         GridCTX ctx;
 
         // ALL OPERATIONS MUST CONVERT FRON INT64 TO FLOAT BEFORE USE
-        std::vector<float> mesh;
+        std::vector<float> mesh(numNodesPerDimension );
         int numLogicCores;
         MassMesh(vec3<double> dims);
         MeshContext ctx;
