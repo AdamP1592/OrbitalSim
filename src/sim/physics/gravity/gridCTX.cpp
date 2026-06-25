@@ -23,30 +23,35 @@ struct GridCTX{
      * @returns index of the cell as it's stored.
      */
     int realToIndex(vec3<double> pos){
+        pos = realToGrid(pos);
         vec3<int> cell = vec3<int>(pos/d);
         
-        cell.x = std::min(cell.x, numNodesPerDim - 1);
-        cell.y = std::min(cell.y, numNodesPerDim - 1);
-        cell.z = std::min(cell.z, numNodesPerDim - 1);
-
-        return cell.x + (cell.y * numNodesPerDim) + (cell.z * numNodesPerDim * numNodesPerDim);
+        return gridToIndex(cell);
     }
-    int getNodeIndexFromNodeCoord(vec3<int> nodeCoords){
+    int gridToIndex(vec3<double>& pos){
+        vec3<int> cell = vec3<int>(pos/d);
+        return gridToIndex(cell);
+    }
+    int gridToIndex(vec3<int> nodeCoords){
+        int zStride = numNodesPerDim + 2;
+
         nodeCoords.x = std::clamp(nodeCoords.x, 0, numNodesPerDim - 1);
         nodeCoords.y = std::clamp(nodeCoords.y, 0, numNodesPerDim - 1);
         nodeCoords.z = std::clamp(nodeCoords.z, 0, numNodesPerDim - 1);
 
-        return nodeCoords.x
-            + nodeCoords.y * numNodesPerDim
-            + nodeCoords.z * numNodesPerDim * numNodesPerDim;
+        return nodeCoords.x * numNodesPerDim * zStride
+            + nodeCoords.y * zStride
+            + nodeCoords.z;
     }
-    vec3<double> getPos(int index){
-    
-        double k = index / (numNodesPerDim * numNodesPerDim);
-        double j = (index / numNodesPerDim) % numNodesPerDim;
-        double i = index % numNodesPerDim;
+    vec3<int> indexToGrid(int index){
+        int zStride = numNodesPerDim + 2;
+        int yStride = numNodesPerDim * zStride;
 
-        return {i, j, k} * d;
+        int x = index / yStride;
+        int y = (index % yStride) / zStride;
+        int z = index % zStride;
+
+        return {x, y, z};
     }
 
 };

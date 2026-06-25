@@ -5,26 +5,29 @@
 #include "vec3.hpp"
 #include "physics/gravity/MassMesh.hpp"
 #include "physics/gravity/MeshContext.hpp"
+#include "physics/gravity/gridCTX.cpp"
 
 
 MassMesh::MassMesh(vec3<double> dims = vec3<double>(100),
                     vec3<double> realDimsMin_ = {0, 0, 0},
                     vec3<double> realDimsMax_ = {1, 1, 1}){
-    numLogicCores = std::thread::hardware_concurrency();
+    
+    //set the main params
     d = dims / numNodesPerDimension;
     realMin = realDimsMin_;
     realMax = realDimsMax_;
 
-    ctx.meshDims = d;
-    ctx.realDimsMax = realDimsMax_;
-    ctx.realDimsMin = realDimsMin_;
+    // pad the grid with 2 * (n/2 + 1) -> n + 2;
+    mesh = n * n * (n + 2)
+
+    // these are owned by the mesh, but given to grid context for positioning
+    ctx.meshDims = &d;
+    ctx.realDimsMax = &realMin;
+    ctx.realDimsMin = &realMax;
     
 }
-void MassMesh::init_cell_policy(){
-    //
-}
 
-        // MASS OPERATIONS
+// MASS OPERATIONS
 void MassMesh::clearMesh(){
     //zerofill the bytes for the mesh in parallel
     std::fill(std::execution::par, mesh.begin(), mesh.end(), 0);
@@ -52,7 +55,7 @@ void MassMesh::addMass(vec3<double> pos, double mass){
 
                 // add mass to node based on it's weight
                 vec3<double> tmp = {cell.x + i, cell.y + j, cell.z + k};
-                int nodeIndex = getNodeIndex({cell.x + i, cell.y + j, cell.z + k});
+                int nodeIndex = ctx.getNodeIndexFromNodeCoord({cell.x + i, cell.y + j, cell.z + k});
                 mesh[nodeIndex] += mass * wx * wy * wz;
             }
         }
