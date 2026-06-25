@@ -28,10 +28,17 @@ struct GridCTX{
         
         return gridToIndex(cell);
     }
+
+    /**
+     * @param pos position in grid coords
+     */
     int gridToIndex(vec3<double>& pos){
         vec3<int> cell = vec3<int>(pos/d);
         return gridToIndex(cell);
     }
+    /**
+     * @param nodeCoords position as an unflattened index;
+     */
     int gridToIndex(vec3<int> nodeCoords){
         int zStride = numNodesPerDim + 2;
 
@@ -52,6 +59,19 @@ struct GridCTX{
         int z = index % zStride;
 
         return {x, y, z};
+    }
+    vec3<double> getCellPos(vec3<double> particlePos){
+        realToGrid(particlePos);
+        vec3<double> cell = math::floor(pos / d);
+
+    }
+    vec3<double> getDD(vec3<double> cellPos){
+        // get the cell corner
+        vec3<double> corner = cell * d; 
+        
+        //for distributing mass across each dimension via cic weighting
+        return (pos - corner) / d;
+    
     }
 
 };
