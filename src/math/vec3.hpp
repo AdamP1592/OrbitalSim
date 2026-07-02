@@ -11,15 +11,18 @@ NOTE: SCALAR AND STANDARD OPERATORS ARE SEPARATE FOR PERFORMANCE
 */
 template <typename T>
 struct vec3{
+    //
+    alignas(std::is_same_v<T, float> ? 16 : alignof(T)) T x, y, z;
+
     T x, y, z;
     // CONSTRUCTORS
-
+    
     // standard construction(either empty or filled)
-    vec3(): x(), y(), z() {}
-    vec3(T _x, T _y, T _z): x(_x), y(_y), z(_z){}
+    constexpr vec3(): x(), y(), z() {}
+    constexpr vec3(T _x, T _y, T _z): x(_x), y(_y), z(_z){}
     
     // for explicit scalar construction
-    vec3(T val): x(val), y(val), z(val) {}
+    constexpr vec3(T val): x(val), y(val), z(val) {}
 
     
     // for explicit casting of float to non float conversion, and implicit casting within the two domains.
@@ -30,18 +33,18 @@ struct vec3{
         ((std::is_floating_point_v<U> && !std::is_floating_point_v<T>) ||
         (!std::is_floating_point_v<U> && std::is_floating_point_v<T>))
     )
-    vec3(const vec3<U>& other)
+    constexpr vec3(const vec3<U> other)
         : x(other.x), y(other.y), z(other.z)
     {}
     // ADDITION
-    vec3<T> operator+(const vec3<T>& other) const{
+    vec3<T> operator+(const vec3<T> other) const{
         return vec3<T>(x + other.x, y + other.y, z + other.z);
     }
     vec3<T> operator+(const T addend) const {
         return vec3<T>(x + addend, y + addend, z + addend);
     }
     
-    vec3<T>& operator+=(const vec3<T>& other){
+    vec3<T>& operator+=(const vec3<T> other){
         x += other.x;
         y += other.y;
         z += other.z;
@@ -55,14 +58,14 @@ struct vec3{
     }
 
     // SUBTRACTION
-    vec3<T> operator-(const vec3<T>& other) const{
+    vec3<T> operator-(const vec3<T> other) const{
         return vec3<T>(x - other.x, y - other.y, z - other.z);
     }
     vec3<T> operator-(const T sub) const{
         return vec3<T>(x - sub, y - sub, z - sub);
     }
 
-    vec3<T>& operator-=(const vec3<T>& other){
+    vec3<T>& operator-=(const vec3<T> other){
         x -= other.x;
         y -= other.y;
         z -= other.z;
@@ -75,14 +78,14 @@ struct vec3{
     }
     
     // DIVISION
-    vec3<T> operator/(const vec3<T>& other) const{
+    vec3<T> operator/(const vec3<T> other) const{
         return vec3<T>(x / other.x, y / other.y, z / other.z);
     }
     vec3<T> operator/(const T div) const{
         return vec3<T>(x / div, y / div, z / div);
     }
 
-    vec3<T>& operator/=(const vec3<T>& other){
+    vec3<T>& operator/=(const vec3<T> other){
         x /= other.x;
         y /= other.y;
         z /= other.z;
@@ -96,7 +99,7 @@ struct vec3{
     }
 
     // MULTIPLICATION
-    vec3<T> operator*(const vec3<T>& other) const{
+    vec3<T> operator*(const vec3<T> other) const{
         return vec3<T>(x * other.x, y * other.y, z * other.z);
     }
     vec3<T> operator*(const T fact) const{
@@ -120,7 +123,7 @@ struct vec3{
     // LOGIC OPERATORS 
 
     // default member comparison methods inlcuded
-    auto operator<=>(const vec3&) const = default;
+    auto operator<=>(const vec3) const = default;
 
 
     bool allLessThan(const T val) const {
@@ -141,7 +144,7 @@ namespace math{
     // NUMERICAL HELPERS: 
 
     template<typename T>
-    vec3<T> max(vec3<T>& a, vec3<T>& b){
+    vec3<T> max(vec3<T> a, vec3<T> b){
         vec3<T> m;
 
         m.x = std::max(a.x, b.x);
@@ -151,7 +154,7 @@ namespace math{
         return m;
     }   
     template<typename T>
-    vec3<T> min(vec3<T>& a, vec3<T>& b){
+    vec3<T> min(vec3<T> a, vec3<T> b){
         vec3<T> m;
 
         m.x = std::min(a.x, b.x);
@@ -170,7 +173,7 @@ namespace math{
 
     //ROUNDING
     template<Floating T>
-    vec3<T> floor(const vec3<T>& v) {
+    vec3<T> floor(const vec3<T> v){
         return {
             static_cast<T>(std::floor(v.x)),
             static_cast<T>(std::floor(v.y)),
@@ -178,7 +181,7 @@ namespace math{
         };
     }
     template<Floating T>
-    vec3<T> ceil(const vec3<T>& v) {
+    vec3<T> ceil(const vec3<T> v) {
         return {
             static_cast<T>(std::ceil(v.x)),
             static_cast<T>(std::ceil(v.y)),
@@ -186,7 +189,7 @@ namespace math{
         };
     }
     template<Floating T>
-    vec3<T> round(const vec3<T>& v) {
+    vec3<T> round(const vec3<T> v) {
         return {
             static_cast<T>(std::round(v.x)),
             static_cast<T>(std::round(v.y)),
@@ -194,7 +197,7 @@ namespace math{
         };
     }
     template<Signed_Numeric T>
-    vec3<T> abs(const vec3<T>& v){
+    vec3<T> abs(const vec3<T> v){
         return {
             static_cast<T>(std::abs(v.x)),
             static_cast<T>(std::abs(v.y)),
@@ -203,7 +206,7 @@ namespace math{
     }
 
     template<Signed_Numeric T>
-    vec3<T> trunc(const vec3<T>& v){
+    vec3<T> trunc(const vec3<T> v){
         return {
             static_cast<T>(std::trunc(v.x)),
             static_cast<T>(std::trunc(v.y)),
