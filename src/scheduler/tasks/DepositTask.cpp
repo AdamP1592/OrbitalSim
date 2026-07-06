@@ -5,16 +5,20 @@
 #include "tasks/Task.cpp"
 #include "vec3.hpp"
 #include "SimCTX.hpp"
-struct DepositTask : Task{
+struct DepositResult{
     std::array<int64_t, 8> totalMass{};
+    std::array<int, 8> globalNodeIndices{};
+};
+
+struct DepositTask : Task<DepositTask, DepositResult>{
     // an array that stores local node index-> global node index. Used for reduction.
     // values are implicitly mapped based on order of operations.
-    std::array<int, 8> globalNodeIndices{};
-
     std::vector<ParticleView> particleViews;
-    SimCTX simCTX;
+    DepositResult r;
+    SimCTX& simCTX;
+    
     /**
-     * Deposit task is a task that deposits all particles for a given cell onto a local-only mesh
+     * Deposit task is a task that deposits all particles for  given cell onto a local-only mesh
      * 
      * @invariant task must contain only particles belonging to the same cell
      * @invariant this task must contain at least one particle
@@ -24,19 +28,18 @@ struct DepositTask : Task{
      * 
      */
     DepositTask(std::vector<ParticleView> particleViews_, SimCTX& simCTX_)
-        : particleViews(particleViews_), simCTX(simCTX_)
+        : particleViews(std::move(particleViews_)), simCTX(simCTX_)
     {
         mapCoords();
     }
     /**
      * Deposits all particles in this task onto the local grid.
      */
-    void run(){
+    void runImpl(){
         // initialize all values outside the loop to ensure cache-friendly performance without
         // relying on the compiler to handle it 
         
         // this will always be the same since particles in this exclusively belong to this cell
-        vec3<int> base = simCTX.gridCTX.realToCell(particleViews[0].position);
         vec3<double> frac;
 
         double fx, fy, fz;
@@ -67,7 +70,7 @@ struct DepositTask : Task{
                 int dy = (i >> 1) & 1;
                 int dz = i & 1;
                 
-                totalMass[i] += static_cast<int64_t>(wx[dx] * wy[dy] * wz[dz] * p.mass * simCTX.scale);
+                r.totalMass[i] += std::llround(wx[dx] * wy[dy] * wz[dz] * p.mass * simCTX.scale);
 
             }
         }
@@ -83,6 +86,9 @@ struct DepositTask : Task{
         }
         mapCoords_();
     }
+    DepositResult getResultImpl() const {
+        return r;
+    }
     
     private:
         /**
@@ -96,8 +102,40 @@ struct DepositTask : Task{
                 vec3<int> d = {(i >> 2) & 1, (i >> 1) & 1,  i & 1};
                 
                 int globalIndex = simCTX.gridCTX.cellToIndex(base + d);
-                globalNodeIndices[i] = globalIndex;
+                r.globalNodeIndices[i] = globalIndex;
             }
         }
 };
 
+struct LocalDepositReduction : TaskReduction<DepositReduction, DepositResult, std::unordered_map<int, int64_t>> {
+    /**
+     * Implementing the CRTP template's accumulateImpl
+     */
+    std::unordered_map<int, int64_t> sparseGrid;
+
+    void accumulateImpl(const DepositResult& result){
+        for(int i = 0; i < 8; i++){
+            sparseGrid[result.globalNodeIndices[i]] += result.totalMass[i];
+        }
+    }
+    std::unordered_map<int, int64_t> getResultImpl() const { 
+        return sparseGrid; 
+    }
+};
+
+struct GlobalDepositReduction: TaskReduction<LocalDepositReduction, unordered_map<int, int64_t>, void>{
+    std::vector<float>& massMesh;
+    SimCTX& simCTX;
+    /**
+     * MESH MUST BE ZEROED BEFORE ANY OPERATION
+     * @param massMesh The flattened mesh from the MassMesh object
+     * @param simCTX The custom SimCTX object provided by the simulation object. 
+     */
+    GlobalDepositReduction(std::vector<float>& massMesh_, SimCTX& simCTX_): massMesh(massMesh_), simCTX(simCTX_){}
+    void accumulateImpl(const unordered_map<int, int64_t>& sparseGrid){
+        const double invScale = 1.0 / simCTX.scale;
+        for(auto [globalIndex, mass] : sparseGrid){
+            massMesh[globalIndex] += static_cast<double>(mass) * invScale;
+        }
+    }
+};
