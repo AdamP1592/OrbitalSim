@@ -3,11 +3,14 @@
 #include <atomic>
 #include <mutex>
 #include <optional>
-template <typename T>
+#include "tasks/DepositTask.cpp"
+template<typename T>
 struct Worker{
     private:
         std::mutex m;
-        T tasks;
+        std::vector<T> tasks;
+        TaskReduction reductions;
+        
         // REPLACE T WHEN TASKS ARE FULLY IMPLEMENTED
         std::vector<uint32_t> taskIndices;
 
@@ -62,12 +65,10 @@ struct Worker{
             
             return std::move(taskIndices[claimed]);
         }
-        void performTask(T task){
-            //perform a specific given task
+        void performTask(TaskTtask){
+            task.run();
         }
-        void performTask(uint32_t index){
-            // perform specific task at the given index. 
-        }
+
         /**
          * Performs the next task in the resource pool
          * @returns {bool} taskCompleted
@@ -121,7 +122,7 @@ struct Worker{
 
             int numWorkersSinceLastTask = 0;
             while(count < n && numWorkersSinceLastTask < workerSize){
-                auto task = workers[workerIndex]->steal();
+                T task = workers[workerIndex]->steal();
                 if(task){
                     count++;
                     numWorkersSinceLastTask = 0;
@@ -151,5 +152,11 @@ struct Worker{
             stolenBuffer.clear();
             
         }
+        void reduceDeposit(){
+            
+        }
 
 };
+namespace GlobalDepositReduction{
+    void mergeIntoMesh(const std::vector<)
+}

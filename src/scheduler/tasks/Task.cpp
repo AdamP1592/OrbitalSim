@@ -18,4 +18,5 @@ struct TaskReduction{
     }
     ResultT getResult() const {
         return static_cast<const Derived*>(this)->getResultImpl();
+    }
 };
