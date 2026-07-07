@@ -42,12 +42,12 @@ class FreeList{
          * @param {size_t} index
          * @return {bool} isValid
          */
-        bool isValid(size_t index){
+        bool isValid(size_t index) const{
             if(index >= storage.size()) return false;
             if(!storage[index].has_value()) return false;
             return true;
         }
-        T& get(size_t index){
+        T& get(size_t index) const{
             retrievalSafetyChecks(index);
             return *storage[index];
         }
@@ -56,13 +56,13 @@ class FreeList{
             storage[index].reset();
             freed.push_back(index);
         }
-        size_t freedSize(){
+        size_t freedSize() const{
             return freed.size();
         }
-        size_t size(){
+        size_t size() const{
             return storage.size();
         }
-        size_t numEntries(){
+        size_t numEntries() const{
             return size() - freedSize();
         }
     
