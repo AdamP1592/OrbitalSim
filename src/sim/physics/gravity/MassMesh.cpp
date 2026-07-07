@@ -66,16 +66,6 @@ void setNode(int index, float mass){
     mesh[index] = mass;
 }
 
-// Node Index/Position helper methods
-int MassMesh::getNodeIndexFromPos(vec3<double> pos){
-    vec3<int> cell = vec3<int>(pos/d);
-    
-    cell.x = std::min(cell.x, numNodesPerDimension - 1);
-    cell.y = std::min(cell.y, numNodesPerDimension - 1);
-    cell.z = std::min(cell.z, numNodesPerDimension - 1);
-
-    return cell.x + (cell.y * numNodesPerDimension) + (cell.z * numNodesPerDimension * numNodesPerDimension);
-}
 vec3<double> MassMesh::getPos(int index){
     
     double k = index / (numNodesPerDimension * numNodesPerDimension);
@@ -83,13 +73,4 @@ vec3<double> MassMesh::getPos(int index){
     double i = index % numNodesPerDimension;
 
     return {i, j, k} * d;
-}
-int MassMesh::getNodeIndexFromNodeCoord(vec3<int> nodeCoords){
-    nodeCoords.x = std::clamp(nodeCoords.x, 0, numNodesPerDimension - 1);
-    nodeCoords.y = std::clamp(nodeCoords.y, 0, numNodesPerDimension - 1);
-    nodeCoords.z = std::clamp(nodeCoords.z, 0, numNodesPerDimension - 1);
-
-    return nodeCoords.x
-        + nodeCoords.y * numNodesPerDimension
-        + nodeCoords.z * numNodesPerDimension * numNodesPerDimension;
 }
