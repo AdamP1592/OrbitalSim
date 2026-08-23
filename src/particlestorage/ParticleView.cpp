@@ -1,5 +1,6 @@
-#include "ParticleStorage.hpp"
-
+#include "vec3.hpp"
 struct ParticleView{
-    ParticleStorage ps;
-}
+    vec3<double> &position;
+    double &mass;
+    size_t &cellIndex;
+};
