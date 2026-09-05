@@ -18,4 +18,6 @@ struct ParticleStorage{
     int removeParticle(size_t index);
     // makes a temporary particle view for a given index
     ParticleView getParticle(size_t index);
+    // sets an existing particle entry to these new values. Unsafe, but efficient. 
+    void setParticle(size_t index, vec3<double> pos, vec3<double> velocity, double mass, size_t cellIndex){
 };

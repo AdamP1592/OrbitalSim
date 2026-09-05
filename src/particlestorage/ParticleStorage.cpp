@@ -20,3 +20,10 @@ ParticleView ParticleStorage::getParticle(size_t index){
 
     return pv;
 }
+// leaving the hanging out of bounds error to prevent repeated checks for batch update
+void ParticleStorage::setParticle(size_t index, vec3<double> pos, vec3<double> velocity, double mass, size_t cellIndex){
+    positionComponents[index] = pos;
+    moveComponents[index] = Moveable(mass, velocity);
+    cellMetaComponenets[index] = cellIndex;
+    
+}
