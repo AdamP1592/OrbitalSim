@@ -4,15 +4,14 @@
 #include <type_traits>
 #include <concepts>
 #include <iostream>
+#include <algorithm>
 
 
 /*
 NOTE: SCALAR AND STANDARD OPERATORS ARE SEPARATE FOR PERFORMANCE
 */
 template <typename T>
-struct vec3{
-    //
-    alignas(std::is_same_v<T, float> ? 16 : alignof(T)) T x, y, z;
+struct alignas(std::is_same_v<T, float> ? 16 : alignof(T)) vec3{
 
     T x, y, z;
     // CONSTRUCTORS
@@ -123,7 +122,7 @@ struct vec3{
     // LOGIC OPERATORS 
 
     // default member comparison methods inlcuded
-    auto operator<=>(const vec3) const = default;
+    auto operator<=>(const vec3<T>& other) const = default;
 
 
     bool allLessThan(const T val) const {
@@ -136,7 +135,7 @@ struct vec3{
 
     
 };
-namespace math{
+namespace vecmath{
     
     // STATELESS FUNCTIONS
 
@@ -213,6 +212,14 @@ namespace math{
             static_cast<T>(std::trunc(v.z))
         };
     }
+    template<Signed_Numeric T>
+    vec3<T> clamp(const vec3<T> v, T lower, T upper){
+        return {
+            static_cast<T>(std::clamp(v.x, lower, upper)),
+            static_cast<T>(std::clamp(v.y, lower, upper)),
+            static_cast<T>(std::clamp(v.z, lower, upper))
+        };
+    }
 
     // STABILITY HELPERS
     template<Floating T>
@@ -230,7 +237,7 @@ namespace math{
     // LOGGING
     template<typename T>
     std::ostream& operator<<(std::ostream& os, const vec3<T>& v){
-        return os << "{" << v.x << ", " << v.y << ", " << v.z;
+        return os << "{" << v.x << ", " << v.y << ", " << v.z << "}";
     }
     
 

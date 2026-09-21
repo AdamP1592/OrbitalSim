@@ -3,7 +3,10 @@ struct GridCTX {
     vec3<double> minRealCoords;
     vec3<double> maxRealCoords;
     vec3<double> gridMax;
+    vec3<double> gridMin;
     vec3<double> d;
+    int pad;
+    int marginCells;
     int numNodesPerDim;
     int zStride;
     /**
@@ -11,11 +14,19 @@ struct GridCTX {
      */
     GridCTX(vec3<double> minRealCoords_, vec3<double> maxRealCoords_,
             vec3<double> gridMax_, int numNodesPerDim_)
-        : minRealCoords(minRealCoords_), maxRealCoords(maxRealCoords_),
-          gridMax(gridMax_), numNodesPerDim(numNodesPerDim_),
+        : gridMax(gridMax_), numNodesPerDim(numNodesPerDim_),
           zStride(numNodesPerDim_ + 2)
     {
-        d = gridMax / static_cast<double>(numNodesPerDim);
+        d = gridMax_ / static_cast<double>(numNodesPerDim);
+        // shrink resolution of the grid to add padding for cic weighting at the boundary
+        gridMin = d * static_cast<double>(pad);               
+        gridMax = gridMax_ - d * static_cast<double>(pad);
+        d = gridMax_ / static_cast<double>(numNodesPerDim_);  
+
+    }
+    void setMinMax(vec3<double> minReal, vec3<double> maxReal){
+        minRealCoords = minReal;
+        maxRealCoords = maxReal;
     }
 
     /**
@@ -24,7 +35,7 @@ struct GridCTX {
      * @returns the position in grid coordinates
      */
     vec3<double> realToGrid(vec3<double> point) const {
-        return ((point - minRealCoords) / (maxRealCoords - minRealCoords)) * gridMax;
+        return gridMin + ((point - minRealCoords) / (maxRealCoords - minRealCoords)) * gridMax;
     }
     /**
      * Converts a grid point into particle space coordinates
@@ -32,7 +43,7 @@ struct GridCTX {
      * @returns the position in particle space
      */
     vec3<double> gridToReal(vec3<double> gridPoint) const {
-        return minRealCoords + (gridPoint / gridMax) * (maxRealCoords - minRealCoords);
+        return minRealCoords + ((gridPoint - gridMin) / (gridMax - gridMin)) * (maxRealCoords - minRealCoords);
     }
     /**
      * Converts directly from real to it's virtual index that can point to the position in flattened space
@@ -50,8 +61,8 @@ struct GridCTX {
      * @returns nodes virtual index
      */
     vec3<int> gridToCell(vec3<double> gridPoint) const {
-        vec3<int> cell(math::floor(gridPoint / d));
-        return math::clamp(math::floor(cell, 0, numNodesPerDim - 1);
+        vec3<int> cell(vecmath::floor(gridPoint / d));
+        return vecmath::clamp(vecmath::floor(cell), 0, numNodesPerDim - 1);
     }
     /**
      * Converts from the virtual node coords to the index in the flattened array
@@ -59,7 +70,7 @@ struct GridCTX {
      * @returns the real index of the node
      */
     int cellToIndex(vec3<int> nodeCoords) const {
-        nodeCoords = math::clamp(nodeCoords, 0, numNodesPerDim - 1);
+        nodeCoords = vecmath::clamp(nodeCoords, 0, numNodesPerDim - 1);
         return nodeCoords.x * numNodesPerDim * zStride + nodeCoords.y * zStride + nodeCoords.z;
     }
     /**
@@ -82,7 +93,9 @@ struct GridCTX {
      */
     vec3<double> getCellFraction(vec3<double> point) const {
         vec3<double> g = realToGrid(point);
-        vec3<double> cellOrigin = vec3<double>(math::floor(g / d) * d);
+        vec<int> cell = gridToCell(g);
+
+        vec3<double> cellOrigin = vec3<double>(cell) * d;
         return (g - cellOrigin) / d;
     }
 };
