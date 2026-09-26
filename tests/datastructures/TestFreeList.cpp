@@ -2,12 +2,12 @@
 #include "LogHelper.hpp"
 #include <iostream>
 
-int runTests(const char* testName){
+int runTests(){
     FreeList<double> fd;
 
     int failed = 0;
     // Push Test
-    testName = "existsTest"
+    const char* testName = "existsTest";
     fd.push(0.0);
     bool validity = fd.isValid(0);
 
@@ -17,7 +17,7 @@ int runTests(const char* testName){
     }
 
     // removal test
-    testName = "removeTest"
+    testName = "removeTest";
     fd.push(1.1);
     fd.remove(0);
     validity = fd.isValid(0);
@@ -25,18 +25,18 @@ int runTests(const char* testName){
     if(fd.get(1) != 1.1 || (validity != false)){
         printLog(fd.get(1), 1.1, testName);
         printLog(validity, false, testName);
-        failure += 1;
+        failed += 1;
         
     }
 
-    testName = "replaceEmpty"
+    testName = "replaceEmpty";
     fd.push(0.3);
     if(fd.get(0) != 0.3){
         printLog(fd.get(0), 0.3, testName);
-        failure += 1;
+        failed += 1;
     }
-    return failure;
 
+    return failed;
 }
 int main(){
     int failedCount = runTests();

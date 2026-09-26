@@ -2,7 +2,7 @@
 #include "LogHelper.hpp"
 
 #include <iostream>
-using namespace math;
+using namespace vecmath;
 
 int mathTests(const char* testName, vec3<double>& v1, vec3<double>& v2){
     int failed = 0;
@@ -11,12 +11,12 @@ int mathTests(const char* testName, vec3<double>& v1, vec3<double>& v2){
 
     v1 = {149.9999999999, 149.9999999999, 149.9999999999};
     v2 = {150, 150, 150};
-    if(!math::roughEquals(v1, v2, 1e-5)){
+    if(!roughEquals(v1, v2, 1e-5)){
         std::cerr << "Epsilon: 1e-5 ";
         printLog(v1, v2, testName);
         failed++;
     }
-
+    
     v1 = {-1.0, 0.0, 3.3};
     v2 = {1.0, 3.0, -3.3};
 
@@ -32,31 +32,31 @@ int mathTests(const char* testName, vec3<double>& v1, vec3<double>& v2){
 
     double eps = 1e-7;
 
-    if(!(math::roughEquals(sum, realSum, eps))){
+    if(!roughEquals(sum, realSum, eps)){
         testName = "SumTest";
 
-        printLog(v1, v2, testName);
+        printLog(sum, realSum, testName);
 
         failed++;
     }
-    if(!(math::roughEquals(difference, realDiff, eps))){
+    if(!roughEquals(difference, realDiff, eps)){
         testName = "DifferenceTest";
 
-        printLog(v1, v2, testName);
+        printLog(difference, realDiff, testName);
 
         failed++;
     }
-    if(!(math::roughEquals(quotient, realQuot, eps))){
+    if(!roughEquals(quotient, realQuot, eps)){
         testName = "DivisionTest";
 
-        printLog(v1, v2, testName);
+        printLog(quotient, realQuot, testName);
 
         failed++;
     }
-    if(!(math::roughEquals(product, realProd, eps))){
+    if(!roughEquals(product, realProd, eps)){
         testName = "MultiplicationTest";
 
-        printLog(v1, v2, testName);
+        printLog(product, realProd, testName);
 
         failed++;
     }
@@ -81,7 +81,7 @@ int runTests(){
     // cast test
     vec3<double> v2 = vec3<double>(v0);
     vec3<double> v3;
-    if(v2 != v3){
+    if(!roughEquals(v2, v3)){
         failed++;
         printLog(v2, v3, testName);
     }
