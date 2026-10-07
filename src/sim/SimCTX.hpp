@@ -1,6 +1,8 @@
 #pragma once
-#include "sim/physics/gravity/MeshContext.hpp"
+#include "physics/gravity/GridCTX.cpp"
 struct SimCTX{
     GridCTX grid;
+    double dt;
     int64_t scale;
+
 };

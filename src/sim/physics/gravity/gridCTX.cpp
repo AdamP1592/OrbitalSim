@@ -12,6 +12,7 @@ struct GridCTX {
     /**
      * GridCTX is a lightweight object for position and index conversion
      */
+    GridCTX(){}
     GridCTX(vec3<double> minRealCoords_, vec3<double> maxRealCoords_,
             vec3<double> gridMax_, int numNodesPerDim_)
         : gridMax(gridMax_), numNodesPerDim(numNodesPerDim_),
@@ -61,8 +62,8 @@ struct GridCTX {
      * @returns nodes virtual index
      */
     vec3<int> gridToCell(vec3<double> gridPoint) const {
-        vec3<int> cell(vecmath::floor(gridPoint / d));
-        return vecmath::clamp(vecmath::floor(cell), 0, numNodesPerDim - 1);
+        const vec3<int> cell(vecmath::floor(gridPoint / d));
+        return vecmath::clamp(cell, 0, numNodesPerDim - 1);
     }
     /**
      * Converts from the virtual node coords to the index in the flattened array
@@ -93,7 +94,7 @@ struct GridCTX {
      */
     vec3<double> getCellFraction(vec3<double> point) const {
         vec3<double> g = realToGrid(point);
-        vec<int> cell = gridToCell(g);
+        vec3<int> cell = gridToCell(g);
 
         vec3<double> cellOrigin = vec3<double>(cell) * d;
         return (g - cellOrigin) / d;

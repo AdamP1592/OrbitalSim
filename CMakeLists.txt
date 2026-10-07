@@ -12,9 +12,9 @@ project(OrbitalSim VERSION 0.0.1 LANGUAGES C CXX)
 
 enable_testing()
 
-add_subdirectory(src)
 add_subdirectory(tests)
+add_subdirectory(src)
 
-add_test(NAME MathTests COMMAND test_math)
+
 #add_executable(orbital_sim main.cpp)
 #target_link_libraries(orbital_sim PRIVATE orbital_core)
