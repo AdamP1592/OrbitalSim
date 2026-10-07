@@ -5,7 +5,9 @@
 #include <random>
 #include <mutex>
 #include <atomic>
-#include "tasks/DepositTask.hpp"
+#include <algorithm>
+#include "tasks/DepositTask.cpp"
+#include "tasks/CreateParticlesTask.cpp"
 template <typename T>
 struct Pool{
     std::vector<T> tasks;
@@ -27,7 +29,8 @@ struct Schedule{
      * @param splitting (UNIMPLEMENTED) a bool to enable splitting
      */
     Schedule(std::vector<SimCTX> simCTXs_, size_t poolCount, size_t maxSize_ = -1, bool splitting_ = false):
-            simCTXs(std::move(simCTXs_)), maxSize(maxSize_), splitting(splitting_){
+            simCTXs(std::move(simCTXs_)), maxSize(maxSize_), spli
+            splitting(splitting_){
         pools.resize(poolCount);
     }
     /**
@@ -44,6 +47,23 @@ struct Schedule{
 
         std::lock_guard<std::mutex> lock(pools[poolIdx].mtx);
         pools[poolIdx].tasks.push_back(std::move(d));
+
+    }
+    /**
+     * @brief Creates all particle creation tasks
+     * Handles all the preparation of the particle storage for new particle insertions and then creates those particles.
+     * 
+     */
+    void createParticleCreationTasks(ParticleStorage& ps, std::vector<vec3<double>> positions, std::vector<vec3<double>> velocities, std::vector<double> masses){
+        // Future optimization: group creation indices by adjacency rather than just splitting them in order.
+        vector<size_t> freed = ps.positionComponenents.freed;
+        // order correctly
+        freed = std::sort(freed);
+
+        // numParticles - freed.size() 
+        int extensionNeeded = masses.size() - freed.size();
+                                        
+        extensionNeeded = extensionNeeded < 0 ? 0 : extensionNeeded;
 
     }
     /**
