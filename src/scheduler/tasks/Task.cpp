@@ -1,22 +1,40 @@
+#include <span>
 
-//CRTPs because the templates will be used for all tasks and reductions to avoid the cost of the 
-// vtables
 template <typename Derived, typename ResultT>
-struct Task{
-    void run(){
-        static_cast<Derived*>(this)->runImpl();
+class Task {
+public:
+    using result_type = ResultT;
+    void run() { self().runImpl(); }
+private:
+    Task() = default;
+    friend Derived;
+
+    Derived& self() { 
+        return static_cast<Derived&>(*this); 
     }
 };
 
-template <typename Derived, typename TaskT, typename ResultT>
-struct TaskReduction{
-    void accumulate(const TaskT& task) {
-        static_cast<Derived*>(this)->accumulateImpl(task);
+template <typename Derived, typename SourceT, typename ResultT>
+class TaskReduction {
+public:
+    using result_type = ResultT;
+
+    void accumulate(const SourceT& src) { 
+        self().accumulateImpl(src); 
     }
-    void accumulate(const std::vector<TaskT>& tasks) {
-        for (const auto& task : tasks) accumulate(task);
+    void accumulate(std::span<const SourceT> srcs) {
+        for (const auto& s : srcs) accumulate(s);
     }
-    ResultT getResult() const {
-        return static_cast<const Derived*>(this)->getResultImpl();
+    [[nodiscard]] ResultT getResult() const { 
+        return self().getResultImpl(); 
     }
+private:
+
+    TaskReduction() = default;
+    friend Derived;
+
+    Derived& self() {
+         return static_cast<Derived&>(*this); 
+    }
+    const Derived& self() const { return static_cast<const Derived&>(*this); }
 };
