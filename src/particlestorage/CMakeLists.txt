@@ -1,8 +1,7 @@
 add_library(ParticleStorage
-    /ParticleStorage.cpp
-    /ParticleView.cpp
-    /components/Moveable.cpp
-    /components/Position.cpp
+    ParticleStorage.cpp
+    components/Moveable.cpp
+    components/Position.cpp
 )
 
 target_include_directories(ParticleStorage PUBLIC
@@ -11,4 +10,7 @@ target_include_directories(ParticleStorage PUBLIC
 
 target_link_libraries(ParticleStorage PUBLIC
     DataStructures
+)
+target_link_libraries(ParticleStorage PUBLIC
+    math
 )

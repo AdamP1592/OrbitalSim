@@ -1,4 +1,9 @@
 #include "Position.hpp"
-void PositionFunctions::drift(vec3<double> p, vec3<double>& v, double dt){
-    p += v * dt;
+
+Position::Position(vec3<double> pos_){
+    pos = pos_;
+}
+
+void Position::set(vec3<double> newPosition){
+    pos = newPosition;
 }

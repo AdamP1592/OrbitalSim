@@ -38,3 +38,8 @@ size_t ParticleStorage::size(){
     // just a relay function 
     return positionComponents.size() - positionComponents.freedSize();
 }
+void ParticleStorage::extendStorage(int slotsNeeded){
+    positionComponents.extend(slotsNeeded);
+    moveComponents.extend(slotsNeeded);
+    cellMetaComponents.extend(slotsNeeded);
+}

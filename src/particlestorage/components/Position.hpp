@@ -3,9 +3,7 @@
 #include "vec3.hpp"
 struct Position{
     vec3<double> pos;
-}
-namespace PositionFunctions{
-    void drift(vec3<double>& v, vec3<double> p, double dt);
-}
-
+    Position(vec3<double> pos_);
+    void set(vec3<double> newPos);
+};
 #endif

@@ -1,7 +1,6 @@
 #ifndef CELLINDEX_HPP
 #define CELLINDEX_HPP
-#include <cstdint>
 struct CellIndex{
-    uint32_t cell;
+    size_t cell;
 };
 #endif
